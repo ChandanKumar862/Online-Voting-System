@@ -1,5 +1,6 @@
 import supabase from '../config/supabase.js';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 // Seed data to initialize tables if Supabase PostgreSQL tables are empty
 const initialUsers = [
@@ -972,7 +973,55 @@ class Store {
 
   // --- VOTING METHODS ---
   async submitVote({ voterId, electionId, candidateId, positionId, constituencyId }) {
-    // 1. Check if already voted
+    // 1. Verify Voter Existence & Active Status
+    const user = await this.findUserById(voterId);
+    if (!user) {
+      const err = new Error('Voter profile not found or inactive.');
+      err.statusCode = 401;
+      throw err;
+    }
+
+    // 2. Verify Election Existence, Status & Window
+    const election = await this.getElectionById(electionId);
+    if (!election) {
+      const err = new Error('Target election not found.');
+      err.statusCode = 404;
+      throw err;
+    }
+
+    if ((election.status || '').toLowerCase() !== 'ongoing') {
+      const err = new Error(`Voting is not active for this election. Current election status is '${election.status || 'inactive'}'.`);
+      err.statusCode = 400;
+      throw err;
+    }
+
+    const now = new Date();
+    if (election.startDate && new Date(election.startDate) > now) {
+      const err = new Error('Voting has not opened yet for this election.');
+      err.statusCode = 400;
+      throw err;
+    }
+    if (election.endDate && new Date(election.endDate) < now) {
+      const err = new Error('Voting for this election has ended.');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    // 3. Verify Candidate Registration for this Election
+    const candidate = await this.getCandidateById(candidateId);
+    if (!candidate) {
+      const err = new Error('Selected candidate is invalid or not registered.');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    if (candidate.electionId !== electionId && candidate.election_id !== electionId) {
+      const err = new Error('Selected candidate is not contesting in this election.');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    // 4. Double Voting Prevention (Check if already voted)
     let existing = null;
     if (this.supabaseAvailable) {
       try {
@@ -994,23 +1043,27 @@ class Store {
     }
 
     const votedAt = new Date().toISOString();
-    const receiptHash = '0x' + Array.from({ length: 8 }, () => Math.floor(Math.random() * 16).toString(16)).join('').toUpperCase();
+    const secretKey = process.env.JWT_SECRET || 'online_voting_secret';
+    const rawString = `${voterId}:${electionId}:${candidateId}:${votedAt}:${secretKey}`;
+    const hash = crypto.createHash('sha256').update(rawString).digest('hex').slice(0, 8).toUpperCase();
+    const receiptHash = `0x${hash}`;
 
-    // 2. Insert into voting_status
+    // 5. Insert into voting_status (tracks that user voted)
     const statusRecord = {
       id: crypto.randomUUID(),
       voter_id: voterId,
       election_id: electionId,
       has_voted: true,
-      voted_at: votedAt
+      voted_at: votedAt,
+      receipt_hash: receiptHash
     };
 
-    // 3. Insert into ballots (voter identity NOT stored here for vote secrecy)
+    // 6. Insert into ballots (secret ballot - voter identity NOT linked)
     const ballotRecord = {
       id: crypto.randomUUID(),
       election_id: electionId,
-      constituency_id: constituencyId || null,
-      position_id: positionId || null,
+      constituency_id: constituencyId || candidate.constituencyId || null,
+      position_id: positionId || candidate.positionId || null,
       candidate_id: candidateId,
       created_at: votedAt
     };
@@ -1025,21 +1078,19 @@ class Store {
     this.votingStatus.push(statusRecord);
     this.ballots.push(ballotRecord);
 
-    const election = await this.getElectionById(electionId);
-    const user = await this.findUserById(voterId);
-
     return {
       id: statusRecord.id,
       userId: voterId,
       electionId,
-      electionName: election ? election.name : 'Election',
-      electionType: election ? election.type : 'Central',
+      electionName: election.name,
+      electionType: election.type,
       votedAt,
       status: 'Verified',
       receiptHash,
-      constituencyName: user ? (user.constituency || 'Patna Sahib') : 'Patna Sahib'
+      constituencyName: user.constituency || candidate.constituencyName || 'Patna Sahib'
     };
   }
+
 
   async getVoteStatus(voterId, electionId) {
     let record = null;
