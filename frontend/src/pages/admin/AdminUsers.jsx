@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { userService } from '../../services/userService';
 import { useToast } from '../../context/ToastContext';
 import DataTable from '../../components/common/DataTable';
@@ -7,7 +7,7 @@ import Modal from '../../components/common/Modal';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import SearchBar from '../../components/common/SearchBar';
 import { formatDate } from '../../utils/formatters';
-import { Users, Edit, Trash2, ShieldCheck, User } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 
 export const AdminUsers = () => {
   const { addToast } = useToast();

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { UserPlus, User, Mail, Lock, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { UserPlus, User, Mail, Lock, ShieldAlert } from 'lucide-react';
 
 export const Register = () => {
   const { register } = useAuth();

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { formatDate } from '../../utils/formatters';
-import { User, Mail, Shield, Key, CheckCircle2, Lock, Save } from 'lucide-react';
+import { User, Mail, CheckCircle2, Save } from 'lucide-react';
 
 export const Profile = () => {
   const { user, updateProfile } = useAuth();
@@ -13,7 +13,7 @@ export const Profile = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
 
     if (password && password !== confirmPassword) {
@@ -22,13 +22,20 @@ export const Profile = () => {
     }
 
     setSaving(true);
-    setTimeout(() => {
-      updateProfile({ fullName });
-      setSaving(false);
+    try {
+      const updateData = { fullName };
+      if (password) {
+        updateData.password = password;
+      }
+      await updateProfile(updateData);
       setPassword('');
       setConfirmPassword('');
       addToast('Profile updated successfully!', 'success');
-    }, 600);
+    } catch (err) {
+      addToast(err.message || 'Failed to update profile', 'error');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -70,14 +70,14 @@ export const Login = () => {
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => setFormData({ email: 'priya@gmail.com', password: 'password123' })}
+              onClick={() => setFormData({ email: 'priya@gmail.com', password: 'voter123' })}
               className="flex-1 py-1 px-2 bg-blue-100 text-blue-800 rounded font-semibold text-[11px] hover:bg-blue-200"
             >
               Voter (Priya)
             </button>
             <button
               type="button"
-              onClick={() => setFormData({ email: 'admin@voting.gov.in', password: 'password123' })}
+              onClick={() => setFormData({ email: 'admin@voting.gov.in', password: 'admin123' })}
               className="flex-1 py-1 px-2 bg-indigo-100 text-indigo-800 rounded font-semibold text-[11px] hover:bg-indigo-200"
             >
               Admin (Chandan)

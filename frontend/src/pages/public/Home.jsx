@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { electionService } from '../../services/electionService';
 import ElectionCard from '../../components/election/ElectionCard';
@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   Lock,
   BarChart3,
-  Search,
   ArrowRight,
   Sparkles,
   Award
@@ -36,8 +35,6 @@ export const Home = () => {
   }, []);
 
   const activeElectionsCount = elections.filter(e => e.status === 'ongoing').length;
-  const upcomingElections = elections.filter(e => e.status === 'upcoming');
-  const ongoingElections = elections.filter(e => e.status === 'ongoing');
 
   return (
     <div className="space-y-16 pb-16">
