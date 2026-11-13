@@ -1,6 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { Vote, Shield, Lock, CheckCircle2 } from 'lucide-react';
+import { Vote, Shield, Lock } from 'lucide-react';
 
 export const Footer = () => {
   return (

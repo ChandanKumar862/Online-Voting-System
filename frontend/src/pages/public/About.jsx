@@ -1,5 +1,4 @@
-import React from 'react';
-import { ShieldCheck, Vote, Lock, Server, CheckCircle2, Award } from 'lucide-react';
+import { ShieldCheck, Lock, Server, CheckCircle2 } from 'lucide-react';
 
 export const About = () => {
   return (

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { electionService } from '../../services/electionService';
 import { candidateService } from '../../services/candidateService';
 import { votingService } from '../../services/votingService';
@@ -8,12 +8,11 @@ import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorState from '../../components/common/ErrorState';
 import { formatDate } from '../../utils/formatters';
-import { Calendar, MapPin, Vote, Award, ArrowLeft, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Calendar, MapPin, Vote, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 export const ElectionDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   
   const [election, setElection] = useState(null);
   const [candidates, setCandidates] = useState([]);

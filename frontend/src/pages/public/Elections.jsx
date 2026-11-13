@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { electionService } from '../../services/electionService';
 import { votingService } from '../../services/votingService';
 import { useAuth } from '../../context/AuthContext';
@@ -7,10 +7,10 @@ import SearchBar from '../../components/common/SearchBar';
 import FilterDropdown from '../../components/common/FilterDropdown';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
-import { Vote, Filter, ArrowUpDown } from 'lucide-react';
+import { Vote, ArrowUpDown } from 'lucide-react';
 
 export const Elections = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [elections, setElections] = useState([]);
   const [userVotesMap, setUserVotesMap] = useState({});
   const [loading, setLoading] = useState(true);
